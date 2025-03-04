@@ -1,13 +1,19 @@
-import Example1 from './components/Example1';
-import Form from './components/Form';
+import React, { useState } from 'react';
+import { VideoModal } from './components/video';
 
-function App() {
+const App: React.FC = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
+
   return (
-    <div className="app">
-      <Example1 />
-      <Form />
+    <div>
+      <h1>點擊按鈕開啟影片視窗</h1>
+      <button onClick={openModal}>播放影片</button>
+      {modalOpen && <VideoModal videoId={1062288466} onClose={closeModal} />}
     </div>
   );
-}
+};
 
 export default App;
