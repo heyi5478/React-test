@@ -4,9 +4,11 @@ import Player, { Options } from '@vimeo/player';
 type VimeoPlayerProps = {
   videoId: number | string;
   width?: number;
+  startTime: number;
+  endTime: number;
 };
 
-export const Video: React.FC<VimeoPlayerProps> = ({ videoId, width = 640 }) => {
+export const Video: React.FC<VimeoPlayerProps> = ({ videoId, width = 640,startTime, endTime }) => {
   const playerContainer = useRef<HTMLDivElement>(null);
   // 使用 ref 避免重複重設播放位置
   const isLoopingRef = useRef<boolean>(false);
@@ -23,15 +25,15 @@ export const Video: React.FC<VimeoPlayerProps> = ({ videoId, width = 640 }) => {
       player = new Player(playerContainer.current, options);
 
       // 設定影片從 10 秒開始播放
-      player.setCurrentTime(10).catch((error: unknown) => {
+      player.setCurrentTime(startTime).catch((error: unknown) => {
         console.error('設定起始時間失敗:', error);
       });
 
       // 監聽播放進度，達到 20 秒時跳回 10 秒以達成循環效果
-      player.on('timeupdate', (data: { seconds: number; [key: string]: any }) => {
-        if (data.seconds >= 20 && !isLoopingRef.current) {
+      player.on('timeupdate', (data: { seconds: number }) => {
+        if (data.seconds >= endTime && !isLoopingRef.current) {
           isLoopingRef.current = true;
-          player?.setCurrentTime(10)
+          player?.setCurrentTime(startTime)
             .then(() => {
               isLoopingRef.current = false;
             })
@@ -52,32 +54,20 @@ export const Video: React.FC<VimeoPlayerProps> = ({ videoId, width = 640 }) => {
         );
       }
     };
-  }, [videoId, width]);
+  }, [videoId, width, startTime, endTime]);
 
   return <div ref={playerContainer} />;
 };
 
 type VideoModalProps = {
   videoId: number | string;
+  startTime: number;
+  endTime: number;
   onClose: () => void;
 };
 
-export const VideoModal: React.FC<VideoModalProps> = ({ videoId, onClose }) => {
+export const VideoModal: React.FC<VideoModalProps> = ({ videoId ,startTime ,endTime ,onClose }) => {
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0,0,0,0.8)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-      }}
-    >
       <div style={{ position: 'relative', width: '80%', maxWidth: 800 }}>
         <button
           onClick={onClose}
@@ -90,8 +80,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({ videoId, onClose }) => {
         >
           關閉
         </button>
-        <Video videoId={videoId} width={800} />
+        <Video videoId={videoId} width={800} startTime={startTime} endTime={endTime} />
       </div>
-    </div>
   );
 };
