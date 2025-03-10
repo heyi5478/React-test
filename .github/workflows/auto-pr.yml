@@ -1,0 +1,21 @@
+name: Auto PR from Develop to Main
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  auto-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          head: develop
+          title: "Auto PR: Update from develop"
+          body: |
+            This is an automatically generated pull request from the develop branch.
+          update-existing: true
